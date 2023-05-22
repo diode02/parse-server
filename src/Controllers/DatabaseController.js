@@ -208,24 +208,27 @@ const filterSensitiveData = (
       perms.protectedFields.temporaryKeys.forEach(k => delete object[k]);
   }
 
-  if (isUserClass) {
-    object.password = object._hashed_password;
-    delete object._hashed_password;
-    delete object.sessionToken;
+  if (!isUserClass) {
+    return object;
   }
+
+  object.password = object._hashed_password;
+  delete object._hashed_password;
+
+  delete object.sessionToken;
 
   if (isMaster) {
     return object;
   }
-  for (const key in object) {
-    if (key.charAt(0) === '_') {
-      delete object[key];
-    }
-  }
-
-  if (!isUserClass) {
-    return object;
-  }
+  delete object._email_verify_token;
+  delete object._perishable_token;
+  delete object._perishable_token_expires_at;
+  delete object._tombstone;
+  delete object._email_verify_token_expires_at;
+  delete object._failed_login_count;
+  delete object._account_lockout_expires_at;
+  delete object._password_changed_at;
+  delete object._password_history;
 
   if (aclGroup.indexOf(object.objectId) > -1) {
     return object;
